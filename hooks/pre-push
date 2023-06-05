@@ -1,0 +1,20 @@
+#!/bin/bash
+# pre-push.sh
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Stash any unstaged changes.
+STASH_NAME="pre-push-$(date +%s)"
+git stash save -q --include-untracked --keep-index $STASH_NAME
+
+# Run make. If it fails, unstashes changes and exits.
+if ! make; then
+  echo "Code failed to compile. Aborting push."
+  git stash pop -q $STASH_NAME
+  exit 1
+fi
+
+# Pop the stash.
+git stash pop -q $STASH_NAME
+exit 0
