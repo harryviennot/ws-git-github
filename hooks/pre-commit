@@ -1,0 +1,20 @@
+#!/bin/bash
+# pre-commit.sh
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Uncomment to turn off output.
+# STASH_NAME="pre-commit-$(date +%s)"
+# git stash save -q --keep-index $STASH_NAME
+
+# Test prospective commit.
+FILES_PATTERN='\.(py)(\..+)?$'
+FORBIDDEN='TODO'
+git diff --cached --name-only | \
+    grep -E $FILES_PATTERN | \
+    GREP_COLOR='4;5;37;41' xargs grep --color --with-filename -n $FORBIDDEN && echo 'COMMIT REJECTED Found "TODO" references. Please remove them before committing.' && exit 1
+
+# Uncomment to apply stash.
+# git stash pop -q $STASH_NAME
+exit 0
